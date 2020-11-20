@@ -1,0 +1,161 @@
+---
+title: "Snowshoe Hares Exploratory Report"
+author: "Alison Sells"
+date: "11/19/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(here)
+library(dplyr)
+library(janitor)
+library(beeswarm)
+library(lubridate)
+library(ggpubr)
+library(broom) 
+library(kableExtra)
+library(effsize)
+
+
+```
+
+#1.Introduction
+
+This report 
+
+
+
+
+
+
+
+
+
+
+
+
+#2.Data and Analyses
+
+
+
+#3.Exploratory Findings
+##A.Annual juvenile hare trap counts
+Juvenile hare trappings were totaled annually from 1999 to 2012
+```{r include=FALSE}
+hares <- read.csv(here("data","bonanza_hares.csv"))
+```
+```{r}
+# Data wrangling to get only juvenile hares
+j_hares <- hares %>% 
+ filter(age== "j")
+
+ # Data wrangling to separate year, and create a count
+hares_count<-j_hares %>% 
+  mutate(date_new= mdy(date)) %>% 
+  mutate(year_new= year(date_new)) %>% 
+  count(year_new)
+
+
+## Plotting the number of juvenile hare trapped per year
+ggplot()+ geom_col(data = hares_count, aes(x= year_new, y= n), fill= "cadetblue4")+
+  scale_x_continuous(breaks = c(1999, 2001, 2003, 2005, 2007, 2009, 2011))+
+  labs(x= "Year", y= "Number of juvenile hare trappings")+
+  theme_minimal()
+```
+
+
+**Figure 1.** Graph detailing the total number of hare trappings within the Bonanza Creek Experimental Forest during 1999-2012,Fairbanks Alaska from Kielland et. al(2017)
+Juvenile trappings 
+
+##Major Takeaways
+  When looking at the total number of snowshoe hare trappings at the site, one can see that the maximum trappings was in 1999 with 126 trappings, and the lowest was in 2010 with 2 trappings. The mean number of trappings was 31.5 per year with a median value of 18.5 trappings per year. This data also shows an overall trend where the number of juveniles trapped decreased significantly throughout the years. However, looking forward to something to consider is not just the year captured but the season and day as well as correlate are the trappings to each trap itself to see where the distribution of trappings are happening. 
+
+```{r,include }
+#summmarize juvenile trappings
+juvenile_trappings_sum <-hares_count %>%
+  group_by(year_new) %>%
+  summarize(
+    mean_trappings = round(mean(n, na.rm = TRUE),2),
+    median_trapping = round(median(n, na.rm = TRUE),2),
+    )
+```
+```{r}
+summary (juvenile_trappings_sum)
+```
+
+
+##B.Visualize juvenile hare weights
+The following visualization aims to explore the relationships between juvenile hare weights as related to sex and the grid site of capture
+```{r jhares_ttest, include=FALSE}
+#Pull vectors of weight for male and female hares by site
+
+m_hares <- j_hares %>% 
+  filter(sex== "m") %>% 
+ pull(weight)  
+
+f_hares <- j_hares %>% 
+  filter(sex== "f") %>% 
+ pull(weight) 
+
+#Sumarize
+juvenile_weight_sum <- j_hares %>%
+  group_by(sex) %>%
+  summarize(
+    mean_weight = round(mean(weight, na.rm = TRUE),2),
+    median_weight = round(median(weight, na.rm = TRUE),2),
+    sd_weight = round(sd(weight,na.rm = TRUE),2),
+    sample_size = n())
+#Graph 
+
+
+# Plot histograms & qq-plots to check assumptions
+hist(m_hares) #Looks mostly normal
+qqnorm(m_hares)# Pretty Linear
+hist(f_hares) # Possibly a bit negatively skewed
+qqnorm(f_hares)#Pretty Linear
+
+# Overall: assumptions of normality hold, & sample size additionally >> Central Limit Theorem (means will be normally distributed). Two-sample t-test OK for means comparison! 
+
+
+```
+```{r}
+
+```
+
+
+##C. Juvenile weight comparison between male and female snowshoe hares)
+
+```{r}
+
+```
+
+
+
+##D. Relationship between juvenile weight and hind foot length
+
+```{r}
+
+```
+
+
+
+#4. Summary
+Overall 
+
+
+#5. Citations
+Kielland, K., F.S. Chapin, R.W. Ruess, and Bonanza Creek LTER. 2017. Snowshoe hare physical data in Bonanza Creek Experimental Forest: 1999-Present ver 22. Environmental Data Initiative. https://doi.org/10.6073/pasta/03dce4856d79b91557d8e6ce2cbcdc14
+
+
+
+
+
+
+
+
+
+
+
+
